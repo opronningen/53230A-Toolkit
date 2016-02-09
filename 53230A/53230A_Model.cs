@@ -303,7 +303,7 @@ namespace _53230A {
             l.ID = SettingID.trig_slop;
             l.DisplayName = "Trigger slope";
             l.SCPI = ":TRIG:SLOP";
-            l.ToolTip = "Selects instrument trigger source.";
+            l.ToolTip = "Selects trigger slope, POSitive or NEGative.";
             l.AllowableValues = new string[] { "POS", "NEG" };
             l.IsActive = delegate () { return this.GetListByID(SettingID.trig_sour).SelectedIndex == 2; }; // Only active if ext trigger selected
             this.Add(l);

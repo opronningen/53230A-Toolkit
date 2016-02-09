@@ -119,6 +119,9 @@ namespace _53230A{
                     readings[i] = BitConverter.ToDouble(readBuffer, (i * 8) + numdigits + 2 );
 
             } else {
+
+                // Single reading returned
+
                 readings = new double[1];
                 readings[0] = BitConverter.ToDouble(readBuffer, 0);
             }
