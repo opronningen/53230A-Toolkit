@@ -164,8 +164,8 @@ namespace _53230A{
             int timeout = 100;
             string[] keyVal;
 
-            while ((s = sr.ReadLine().Trim()) != "") {
-                keyVal = s.Split(new char[] { '=' }, 2);
+            while ((s = sr.ReadLine()) != null) {
+                keyVal = s.Split(new char[] { '=', ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
                 if (keyVal[0].Equals("address", StringComparison.InvariantCultureIgnoreCase))
                     host = keyVal[1];

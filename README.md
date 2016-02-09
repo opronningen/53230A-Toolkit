@@ -26,3 +26,6 @@ The 53230A sometimes may exhibit some strange behaviour, I find an effective sho
 
 ## Query \<statement\>
 \<statement\> - Query to send to the counter, e.g. ":SAMPle:COUNt?". Sends the query to the counter, and reads the response.
+
+### "Setup":
+Edit file "Ag53230A.ini" in the same directory as the utilities, set ipaddress of the counter and default timeout
