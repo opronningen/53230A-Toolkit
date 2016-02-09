@@ -69,7 +69,7 @@ HRPhase -r <rate> [-t <tau>] [-f <f_ref> <f_dut> | -f auto] [-d n] [-op | -of] [
             public double f_ref = 5e6;
             public double sampleRate = 100;     // Frequency of the external trigger
             public int estimator = 0;           // 0 = pi (straight average), 1 = lambda (linear curve fit). Only relevant for frequency estimates
-            public bool output_phase = false;    // Either phase or frequency is returned
+            public bool output_phase = false;   // Either phase or frequency is returned
             public double tau = 1;              // Time between output samples. tau * samplerate gives number of averaged readings
         };
 
