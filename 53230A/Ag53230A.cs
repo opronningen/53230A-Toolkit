@@ -5,8 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
-using IniParser;
-using IniParser.Model;
+using System.IO;
 
 namespace _53230A{
     public class Ag53230A{
@@ -146,23 +145,37 @@ namespace _53230A{
         }
 
         public string[] ReadErrors() {
-            WriteString("SYST:ERR?");
+            
             List<string> errors = new List<string>();
 
             do {
-                errors.Add(ReadString());
+                WriteString(";SYST:ERR?");
+                errors.Add(ReadString().Trim());
             } while (!errors.Last().StartsWith("+0,"));
 
             return errors.ToArray();
         }
 
+        // TO-DO: Remove FileIniDataParser - only 2 or 3 statements are relevant, no need for 3rd party parser..
         public Ag53230A() {
-            var parser = new FileIniDataParser();
-            IniData data = parser.ReadFile("Ag53230A.ini");
-            string host = data["Comm"]["address"];
+            StreamReader sr = new StreamReader("Ag53230A.ini");
+
+            string s, host = "";
+            int timeout = 100;
+            string[] keyVal;
+
+            while ((s = sr.ReadLine().Trim()) != "") {
+                keyVal = s.Split(new char[] { '=' }, 2);
+
+                if (keyVal[0].Equals("address", StringComparison.InvariantCultureIgnoreCase))
+                    host = keyVal[1];
+                else if (keyVal[0].Equals("timeout", StringComparison.InvariantCultureIgnoreCase))
+                    timeout = Int32.Parse(keyVal[1]);
+            }
 
             t = new TcpClient(host, 5025);
             ns = t.GetStream();
+            ns.ReadTimeout = timeout;
         }
 
         ~Ag53230A() {

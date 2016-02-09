@@ -102,10 +102,15 @@ namespace Learn {
         };
 #endregion
 
+
+        /*
+            TO-DO:
+                * Add option -a to show all settings, even if they are the default
+                * Add option to show "protected" settings? "ROSC:*"
+        */
         static void Main(string[] args) {
             Ag53230A instr = new Ag53230A();
 
-            
             List<string> input = new List<string>();
 
             // If input is redirected, assume it is from a file we want to upload to the instrument.

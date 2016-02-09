@@ -13,7 +13,7 @@ increase this number. Note that this does not configure the counter to make fast
 request more than one sample per IO. Runs untill aborted with ctrl-c.
 
 Issues ":Initiate:Immediate", followed by repeated "DATA:REMove \<n\>,WAIT". This can be used to retrieve continous gap-free 
-measurements on the 53230A. Note that ":Sample:count" must be set to the total number og samples to retrieve over the measurement session. See "Learn".
+measurements on the 53230A. Note that ":Sample:count" must be set to the total number of samples to retrieve over the measurement session. See "Learn".
 
 ## Learn [\<statements\>]
 \<statements\> - Optional configuration statements to send to the counter, e.g. ":SAMPle:COUNt 1e6". If no statements are given, lists the current (non-default) configuration settings of the counter. This can be
