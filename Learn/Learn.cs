@@ -146,9 +146,8 @@ namespace Learn {
 
             // If errors, print.
             string[] errors = instr.ReadErrors();
-            if (errors.Length > 1)
-                foreach (string error in errors)
-                    Console.Error.WriteLine(error);
+            foreach (string error in errors)
+                Console.Error.WriteLine(error);
         }
     }
 }

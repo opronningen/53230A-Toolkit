@@ -24,9 +24,8 @@ namespace Query {
 
             // Write errorlog - if any. Last errormessage is always +0, "No Error"
             string[] errors = instr.ReadErrors();
-            if(errors.Length > 1)
-                foreach (string error in errors)
-                    Console.Error.WriteLine(error);
+            foreach (string error in errors)
+                Console.Error.WriteLine(error);
         }
     }
 }

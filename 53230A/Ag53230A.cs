@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.IO;
 
-namespace _53230A{
-    public class Ag53230A{
+namespace _53230A {
+    public class Ag53230A {
         public Configuration Conf = new Configuration();
 
         public bool AutoCommit = true;      // Immediately send configuration-statements to the instrument when changes are made.
@@ -37,19 +37,24 @@ namespace _53230A{
                 return (null);
 
             // Stop reading when we get CR/LF
-            while (res != 10) {
-                res = ns.ReadByte();
-                if (res == -1)
-                    break;
+            try {
+                while (res != 10) {
+                    res = ns.ReadByte();
+                    if (res == -1)
+                        break;
 
-                readBuffer[i++] = (byte)res;
+                    readBuffer[i++] = (byte)res;
 
-                // Check for buffer overflow - double the readbuffer size
-                if (i >= readBuffer.Length) {
-                    byte[] tmp = new byte[readBuffer.Length * 2];
-                    readBuffer.CopyTo(tmp, 0);
-                    readBuffer = tmp;
+                    // Check for buffer overflow - double the readbuffer size
+                    if (i >= readBuffer.Length) {
+                        byte[] tmp = new byte[readBuffer.Length * 2];
+                        readBuffer.CopyTo(tmp, 0);
+                        readBuffer = tmp;
+                    }
                 }
+            } catch (IOException) {
+                Console.WriteLine("Timeout.");
+                Environment.Exit(-1);
             }
 
             return (Encoding.ASCII.GetString(readBuffer, 0, i));
@@ -82,47 +87,52 @@ namespace _53230A{
         public double[] ReadReals() {
             double[] readings = null;
 
-            // Read first 8 bytes, first two is always '#n' if block format, where n is number of digits in number to follow.
-            if (ns.Read(readBuffer, 0, 8) == -1)
-                return null;
-
-            // If first character is #, interpret as Block Form. Else parse as single value.
-            if (readBuffer[0] == '#') {
-
-                // "Number of digits in the number of bytes" - typically 2-4. Absolute worst case is 8000000
-                // (1 million readings), 7 digits. Will fail.. 6 digits (<125k readings) will be ok.
-                int numdigits = 0;
-                if (!Int32.TryParse(Encoding.ASCII.GetString(readBuffer, 1, 1), out numdigits))
+            try {
+                // Read first 8 bytes, first two is always '#n' if block format, where n is number of digits in number to follow.
+                if (ns.Read(readBuffer, 0, 8) == -1)
                     return null;
 
-                // numBytes contain actual number of bytes the counter returns
-                int numbytes = 0;
-                if (!Int32.TryParse(Encoding.ASCII.GetString(readBuffer, 2, numdigits), out numbytes))
-                    return null;
+                // If first character is #, interpret as Block Form. Else parse as single value.
+                if (readBuffer[0] == '#') {
 
-                // Ensure we have enough space to receive the block, account for header
-                while (numbytes + numdigits + 2 > readBuffer.Length) {
-                    byte[] tmp = new byte[readBuffer.Length * 2];
-                    Array.Copy(readBuffer, tmp, 8);
-                    readBuffer = tmp;
+                    // "Number of digits in the number of bytes" - typically 2-4. Absolute worst case is 8000000
+                    // (1 million readings), 7 digits. Will fail.. 6 digits (<125k readings) will be ok.
+                    int numdigits = 0;
+                    if (!Int32.TryParse(Encoding.ASCII.GetString(readBuffer, 1, 1), out numdigits))
+                        return null;
+
+                    // numBytes contain actual number of bytes the counter returns
+                    int numbytes = 0;
+                    if (!Int32.TryParse(Encoding.ASCII.GetString(readBuffer, 2, numdigits), out numbytes))
+                        return null;
+
+                    // Ensure we have enough space to receive the block, account for header
+                    while (numbytes + numdigits + 2 > readBuffer.Length) {
+                        byte[] tmp = new byte[readBuffer.Length * 2];
+                        Array.Copy(readBuffer, tmp, 8);
+                        readBuffer = tmp;
+                    }
+
+                    // Read actual datablock
+                    if (ns.Read(readBuffer, 2 + numdigits, numbytes) == -1)
+                        return null;
+
+                    // allocate an array for the readings.
+                    readings = new double[numbytes / 8];
+
+                    for (int i = 0; i < readings.Length; i++)
+                        readings[i] = BitConverter.ToDouble(readBuffer, (i * 8) + numdigits + 2);
+
+                } else {
+
+                    // Single reading returned
+
+                    readings = new double[1];
+                    readings[0] = BitConverter.ToDouble(readBuffer, 0);
                 }
-
-                // Read actual datablock
-                if (ns.Read(readBuffer, 2 + numdigits, numbytes) == -1)
-                    return null;
-
-                // allocate an array for the readings.
-                readings = new double[numbytes / 8];
-
-                for (int i = 0; i < readings.Length; i++)
-                    readings[i] = BitConverter.ToDouble(readBuffer, (i * 8) + numdigits + 2 );
-
-            } else {
-
-                // Single reading returned
-
-                readings = new double[1];
-                readings[0] = BitConverter.ToDouble(readBuffer, 0);
+            } catch (IOException) {
+                Console.WriteLine("Timeout.");
+                Environment.Exit(-1);
             }
 
             return readings;
@@ -145,18 +155,23 @@ namespace _53230A{
         }
 
         public string[] ReadErrors() {
-            
+
             List<string> errors = new List<string>();
 
-            do {
+            string s;
+            while (true) {
                 WriteString(";SYST:ERR?");
-                errors.Add(ReadString().Trim());
-            } while (!errors.Last().StartsWith("+0,"));
+                s = ReadString().Trim();
+
+                if (!s.StartsWith("+0,"))
+                    errors.Add(s);
+                else
+                    break;
+            }
 
             return errors.ToArray();
         }
 
-        // TO-DO: Remove FileIniDataParser - only 2 or 3 statements are relevant, no need for 3rd party parser..
         public Ag53230A() {
             StreamReader sr = new StreamReader("Ag53230A.ini");
 
