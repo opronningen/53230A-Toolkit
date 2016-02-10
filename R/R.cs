@@ -15,7 +15,7 @@ namespace R
         * specified with ":samp:count" has been made, possibly multiplied with the number of triggers
         * to accept, specified with ":trig:count". Depends on the measurement mode, RTFM.
         * 
-        * Runs untill aborted with ctrl-c.
+        * Runs untill aborted with ctrl-c, or times out.
         *
         * To do:
         *   Add option to NOT sent INIT:IMM, if instrument gets triggered from some other source.

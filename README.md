@@ -5,12 +5,12 @@ This also means they will not work over USB or GPIB. Familiarity with the 53230a
 The utilities should run on Linux under Mono, but this is only marginally tested..
 
 ## Read
-Issues ":Initiate:Immediate", followed by repeated "Read?". Runs untill aborted with ctrl-c.
+Issues ":Initiate:Immediate", followed by repeated "Read?". Runs untill aborted with ctrl-c, or timeout.
 
 ## R [n]
 n - Optional, number of samples to request per IO. Default 1. For fast measurements (> 10 measurements per second), 
 increase this number. Note that this does not configure the counter to make fast measurements, it only instructs "R" to 
-request more than one sample per IO. Runs untill aborted with ctrl-c.
+request more than one sample per IO. Runs untill aborted with ctrl-c, or timeout.
 
 Issues ":Initiate:Immediate", followed by repeated "DATA:REMove \<n\>,WAIT". This can be used to retrieve continous gap-free 
 measurements on the 53230A. Note that ":Sample:count" must be set to the total number of samples to retrieve over the measurement session. See "Learn".
@@ -27,5 +27,5 @@ The 53230A sometimes may exhibit some strange behaviour, I find an effective sho
 ## Query \<statement\>
 \<statement\> - Query to send to the counter, e.g. ":SAMPle:COUNt?". Sends the query to the counter, and reads the response.
 
-### "Setup":
+### "Setup"
 Edit file "Ag53230A.ini" in the same directory as the utilities, set ipaddress of the counter and default timeout
