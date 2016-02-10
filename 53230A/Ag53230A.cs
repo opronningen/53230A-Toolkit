@@ -46,7 +46,7 @@ namespace _53230A {
                     readBuffer[i++] = (byte)res;
 
                     // Check for buffer overflow - double the readbuffer size
-                    if (i >= readBuffer.Length) {
+                    while (i >= readBuffer.Length) {
                         byte[] tmp = new byte[readBuffer.Length * 2];
                         readBuffer.CopyTo(tmp, 0);
                         readBuffer = tmp;
@@ -75,9 +75,7 @@ namespace _53230A {
                 double[] values = new double[readings.Length];
 
                 for (int i = 0; i < values.Length; i++)
-                    if (!double.TryParse(readings[i], NumberStyles.AllowExponent | NumberStyles.Float, CultureInfo.InvariantCulture, out values[i])) {
-                        //Err.WriteLine("Could not parse '{0}'", readings[i]);
-                    }
+                    values[i] = double.Parse(readings[i], NumberStyles.AllowExponent | NumberStyles.Float, CultureInfo.InvariantCulture);
 
                 return values;
             }

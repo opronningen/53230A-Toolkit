@@ -10,9 +10,14 @@ namespace Query {
         static void Main(string[] args) {
             Ag53230A instr = new Ag53230A();
 
-            if (args.Length > 0)
+            if (args.Length > 0) {
                 instr.WriteString(args[0]);
-            else
+                if (!args[0].Contains("?")){
+                    Console.WriteLine("Not a query.");     // Queries usually ends with ?, but at least contains ? ("TRIG:SOUR?", ":DATA:REM? 1,WAIT")
+                    return;
+                }
+
+            } else
                 return;
 
             String str = instr.ReadString();
@@ -22,7 +27,7 @@ namespace Query {
             foreach (string r in res)
                 Console.WriteLine(r);
 
-            // Write errorlog - if any. Last errormessage is always +0, "No Error"
+            // Write errorlog - if any.
             string[] errors = instr.ReadErrors();
             foreach (string error in errors)
                 Console.Error.WriteLine(error);

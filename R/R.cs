@@ -19,10 +19,7 @@ namespace R
         *
         * To do:
         *   Add option to NOT sent INIT:IMM, if instrument gets triggered from some other source.
-        *   Add option to specify number of samples to retrieve per call. Reduce number of IO for fast measurements.
-        *   Add option to specify timeout
         *   Add option to specify number of readings to fetch in total, then exit.
-        *   Add functionality to retrieve results in other formats; as specified with ":FORMat:DATA", definite block length
         *
         */
 
@@ -41,7 +38,7 @@ namespace R
 
             // Trigger
             instr.WriteString("ABORT;*WAI;INIT:IMM");
-            System.Threading.Thread.Sleep(20);
+            System.Threading.Thread.Sleep(20);                  // The instrument will beep if the :DATA:REM follows too fast after INIT:IMM
 
             string query = String.Format(":DATA:REMOVE? {0},WAIT", pts.ToString());
 
