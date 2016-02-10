@@ -2,6 +2,8 @@
 A collection of simple command line utilities to communicate with and program the Keysight 53210/53220/53230A frequency counters. The utilities use only TCP/IP sockets, and has no dependancies to NI or Keysight drivers. 
 This also means they will not work over USB or GPIB. Familiarity with the 53230a programming guide is required.
 
+The code is extremely simplistic, mostly just a few lines of code. Very little emphasis is put on correctly handling errors and corner cases. Based on my experience, if the utilities throw an exception, there is something wrong somewhere else. YMMV.
+
 The utilities should run on Linux under Mono, but this is only marginally tested..
 
 ## Read
