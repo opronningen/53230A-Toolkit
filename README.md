@@ -2,9 +2,9 @@
 A collection of simple command line utilities to communicate with and program the Keysight 53210/53220/53230A frequency counters. The utilities use only TCP/IP sockets, and has no dependancies to NI or Keysight drivers. 
 This also means they will not work over USB or GPIB. Familiarity with the 53230a programming guide is required.
 
-The code is extremely simplistic, mostly just a few lines of code. Very little emphasis is put on correctly handling errors and corner cases. Based on my experience, if the utilities throw an exception, there is something wrong somewhere else. YMMV.
+The code is extremely simplistic, mostly just a few lines of code. Very little emphasis is put on correctly handling errors and corner cases. Based on my experience, if the utilities throw an exception, there is something wrong somewhere else. YMMV. I use them daily, and they appear to be stable.
 
-The utilities should run on Linux under Mono, but this is only marginally tested..
+The utilities should run on Linux under Mono, but this is only marginally tested.. This is very much a work in progress, features will be added if and when I need them. 
 
 ## Read
 Issues ":Initiate:Immediate", followed by repeated "Read?". Runs untill aborted with ctrl-c, or timeout.
@@ -30,4 +30,4 @@ The 53230A sometimes may exhibit some strange behaviour, I find an effective sho
 \<statement\> - Query to send to the counter, e.g. ":SAMPle:COUNt?". Sends the query to the counter, and reads the response.
 
 ### "Setup"
-Edit file "Ag53230A.ini" in the same directory as the utilities, set ipaddress of the counter and default timeout
+If you only want the latest binaries, download the contents of "dist" to a local folder. Edit file "Ag53230A.ini", set ipaddress of the counter and default timeout. Note that the timeout needs to be concistent with the number of samples requested (i.e. with R), gate time etc.
