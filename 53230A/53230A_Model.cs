@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace _53230A {
 
-    // Enumeration of all (most - ROSC is currently missing) valid SCPI abbreviations
+    // Enumeration of most valid SCPI abbreviations
     public enum SettingID {
         func,
         calc_aver,
@@ -247,13 +247,6 @@ namespace _53230A {
 
         // Set up the (default) configuration
         public Configuration() {
-            //ListSetting s = new ListSetting();
-            //s.SCPI = ":INPut1:ATTenuation";
-            //s.ToolTip = "Attenuates the input signal with 1 or 10. The attenuation is automatically set if the input level is set to AUTO.";
-            //s.AllowableValues = new string[] { "Auto", "1", "10" };
-            //s.IsActive = delegate () { return ((ListSetting)this.GetBySCPI(":INPut1:LEVel:AUTO")).SelectedIndex == 1; };
-            //this.Add(s);
-
             // Start with only the relevant settings, add on as we go..
 
             // Function section
