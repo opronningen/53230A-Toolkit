@@ -171,7 +171,11 @@ namespace _53230A {
         }
 
         public Ag53230A() {
-            StreamReader sr = new StreamReader("Ag53230A.ini");
+            // Look for ini-file in the directory where the executable is located.
+            string path = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+            var directory = Path.GetDirectoryName(path);
+            string fileuri = Path.Combine(directory, "Ag53230A.ini");
+            StreamReader sr = new StreamReader(new Uri(fileuri).LocalPath);
 
             string s, host = "";
             int timeout = 100;
