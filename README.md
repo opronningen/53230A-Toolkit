@@ -30,4 +30,4 @@ The 53230A sometimes may exhibit some strange behaviour, I find an effective sho
 \<statement\> - Query to send to the counter, e.g. ":SAMPle:COUNt?". Sends the query to the counter, and reads the response.
 
 ### "Setup"
-If you only want the latest binaries, download the contents of "dist" to a local folder. Edit file "Ag53230A.ini", set ipaddress of the counter and default timeout. Note that the timeout needs to be concistent with the number of samples requested (i.e. with R), gate time etc.
+If you only want the latest binaries, download the contents of "dist" to a local folder. Edit file "Ag53230A.ini", set ipaddress of the counter and default timeout. Note that the timeout needs to be consistent with the number of samples requested (i.e. with R), gate time etc.
