@@ -11,20 +11,34 @@ namespace _53230A_Read {
         static void Main(string[] args) {
             
             Ag53230A instr = new Ag53230A();
+            instr.LearnConfig();
 
-            instr.WriteString("READ?");
+            int repeat = -1;
 
-            String str = instr.ReadString();
+            if(args.Length > 0)
+                if (!Int32.TryParse(args[0], out repeat))
+                    Console.Error.WriteLine("Warning! Unable to parse argument {0}", args[0]);
 
-            String[] readings = str.Split(new char[] { ',' });
+            while (repeat == -1 || repeat-- > 0) {
+                instr.WriteString("READ?");
 
-            foreach(string r in readings)
-                Console.WriteLine(r);
+                double[] res = instr.GetReadings();
+
+                foreach (double d in res) {
+                    Console.WriteLine(d.ToString());    // Todo: formatstring
+                }
+
+                //String str = instr.ReadString().Trim();
+
+                //String[] readings = str.Split(new char[] { ',' });
+
+                //foreach (string r in readings)
+                //    Console.WriteLine(r);
+            }
 
             string[] errors = instr.ReadErrors();
-            if (errors.Length > 1)
-                foreach (string error in errors)
-                    Console.Error.WriteLine(error);
+            foreach (string error in errors)
+                Console.Error.WriteLine(error);
         }
     }
 }

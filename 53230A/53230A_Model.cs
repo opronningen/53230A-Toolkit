@@ -99,8 +99,35 @@ namespace _53230A {
         trig_sour
     };
 
+    public class SCPInode {
+
+        public string Name = null;
+
+        public List<SCPInode> Children = new List<SCPInode>();
+        public SCPInode Parent = null;
+
+        // Recursively walk an array of tokens
+        public SCPInode Find(string[] tokens) {
+            if (tokens == null || tokens.Length == 0)
+                return null;
+
+            SCPInode child = Children.FirstOrDefault(s => s.Name == tokens[0]);
+            if (tokens.Length == 1)
+                return child;
+            else
+                return (child?.Find(tokens.Skip(1).ToArray()));
+        }
+
+        // Assumes Name has format ":xxx:yyy:zzz:..."
+        public SCPInode Find(string namestr) {
+            string[] tokens = namestr.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+            return this.Find(tokens);
+
+        }
+    }
+
     // Base class for settings
-    public class Setting {
+    public class Setting : SCPInode {
         public SettingID ID;
         public string DisplayName;      // Text to show as a label with a control in the GUI
         public string SCPI;             // Text to send to instrument
@@ -116,6 +143,7 @@ namespace _53230A {
     }
 
     // A setting that takes a numeric value
+    // TO-DO: Some settings can also take discrete values, "MAX, MIN, DEF" etc. How to handle?
     public class NumericSetting : Setting {
         public double MaxValue;
         public double MinValue;
@@ -143,6 +171,7 @@ namespace _53230A {
     }
 
     // A setting that can take a defined list of values
+    // TO-DO: Also provide optional "friendlyNames" for use in GUI? Ex "(@1),(@2)" -> "1→2"
     public class ListSetting : Setting {
         public string[] AllowableValues = { "" };
 
@@ -172,10 +201,49 @@ namespace _53230A {
     }
 
     public class Configuration : List<Setting> {
+        public SCPInode root = new SCPInode();
+
+        // Override the Add-method, build parsetree here.
+        public new void Add(Setting s) {
+            base.Add(s);
+
+            // Build parse tree
+            SCPInode node;
+            SCPInode parent = root;
+
+            string[] keywords = s.SCPI.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for(int i = 0; i < keywords.Length; i++) {
+                node = parent.Find(keywords[i]);
+
+                if (node == null) {
+
+                    // If this is the last keyword, add the setting. Else add a new SCPInode. 
+                    if(i+1 == keywords.Length) {
+                        node = s;
+                    } else {
+                        node = new SCPInode();
+                    }
+                    
+                    node.Name = keywords[i];
+                    node.Parent = parent;
+
+                    parent.Children.Add(node);
+                } else {
+
+                    // Node is not null. If this is the last keyword, it means this setting has already been defined.
+                    if(i == keywords.Length - 1) {
+                        throw new Exception("Node already defined");
+                    }
+                }
+
+                parent = node;
+            }
+        }
 
         // Return a setting based on its associated SCPI string
         public Setting GetBySCPI(string scpi) {
-            return this.FirstOrDefault(s => s.SCPI.Equals(scpi));
+            return this.FirstOrDefault(s => s.SCPI.Equals(scpi, StringComparison.InvariantCultureIgnoreCase));
         }
 
         public Setting GetByID(SettingID id) {
@@ -210,6 +278,8 @@ namespace _53230A {
         }
 
         // Read current configuration from the instrument
+        // TO-DO:   Pull configuration-statements that is not returned with "*LRN?" - Ex ROSC
+        //          If instrument does not support "*LRN", query each setting separately
         public void LearnConfig(string state) {
             string tmp;
             string[] key_val = new string[2];
@@ -239,6 +309,8 @@ namespace _53230A {
                         throw new ArgumentException("Error! Could not parse numeric value \'" + key_val[1] + "\' for setting \'" + key_val[0] + "\'");
 
                     n.value = val;
+                } else {
+                    // Setting is not defined in the instrument model
                 }
             }
 
@@ -337,7 +409,7 @@ namespace _53230A {
             l = new ListSetting();
             l.ID = SettingID.form;
             l.DisplayName = "Data format";
-            l.SCPI = "FORM";
+            l.SCPI = ":FORM";
             l.ToolTip = "Defines if data is returned in 15-character printable ascii strings, or 64-bit binary values.";
             l.AllowableValues = new string[] { "ASC,15", "REAL,64" };
             this.Add(l);
@@ -346,7 +418,7 @@ namespace _53230A {
             l = new ListSetting();
             l.ID = SettingID.form_bord;
             l.DisplayName = "Byte order";
-            l.SCPI = "FORM:BORD";
+            l.SCPI = ":FORM:BORD";
             l.ToolTip = "Defines if 64-bit binary values are returned big- or little-endian. Intel is little endian, SWAP";
             l.AllowableValues = new string[] { "NORM", "SWAP" };
             n.IsActive = delegate () { return GetListByID(SettingID.form).SelectedIndex == 2; };
